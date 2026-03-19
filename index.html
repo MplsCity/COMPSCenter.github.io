@@ -26,28 +26,23 @@
        BRAND TOKENS — City of Minneapolis
        ============================================================ */
     :root {
-      --blue-header:    #1e6fa8;   /* full-width header bar                */
-      --blue-link:      #1a6faf;   /* body links, card titles, breadcrumbs */
-      --blue-link-dark: #15558a;   /* hover state                          */
-      --red-accent:     #cc2200;   /* city site red accent stripe          */
-      --green-icon:     #8a9a1e;   /* icon tile base                       */
-      --green-icon-lt:  #a2b427;   /* icon tile lighter stop               */
-      --gray-utility:   #2d2d2d;   /* top utility bar + footer bg          */
-      --gray-divider:   #d0ccc8;   /* horizontal rules                     */
-      --gray-section:   #eceff1;   /* "I want to" section bg               */
-      --gray-body:      #4a4a4a;   /* body copy                            */
-      --gray-meta:      #717171;   /* descriptions / sub-text              */
+      --blue-header:    #1e6fa8;
+      --blue-link:      #1a6faf;
+      --blue-link-dark: #15558a;
+      --red-accent:     #cc2200;
+      --green-icon:     #8a9a1e;
+      --green-icon-lt:  #a2b427;
+      --gray-utility:   #2d2d2d;
+      --gray-divider:   #d0ccc8;
+      --gray-section:   #eceff1;
+      --gray-body:      #4a4a4a;
+      --gray-meta:      #717171;
       --white:          #ffffff;
       --font-ui: 'Myriad Pro', Calibri, 'Trebuchet MS', Arial, sans-serif;
     }
 
-    /* ============================================================
-       RESET & BASE
-       ============================================================ */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
-
     body {
       font-family: var(--font-ui);
       color: var(--gray-body);
@@ -59,7 +54,6 @@
       overflow-x: hidden;
       overflow-y: auto;
     }
-
     a { color: inherit; text-decoration: none; }
     a:focus-visible { outline: 3px solid var(--blue-link); outline-offset: 2px; }
 
@@ -67,39 +61,24 @@
        IDLE WARNING OVERLAY
        ============================================================ */
     #idle-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.70);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.70); z-index: 9999;
+      align-items: center; justify-content: center;
     }
     #idle-overlay.visible { display: flex; }
-
     #idle-box {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 52px 60px;
-      text-align: center;
-      max-width: 520px;
-      width: 90%;
+      background: var(--white); border-radius: 14px; padding: 52px 60px;
+      text-align: center; max-width: 520px; width: 90%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
-    #idle-box i          { font-size: 56px; color: #e07b00; display: block; margin-bottom: 20px; }
-    #idle-box h2         { font-size: 28px; color: var(--gray-utility); margin-bottom: 10px; }
-    #idle-box p          { font-size: 17px; color: var(--gray-meta); line-height: 1.55; margin-bottom: 24px; }
-    #idle-countdown      { font-size: 60px; font-weight: 700; color: var(--blue-header); line-height: 1; margin-bottom: 28px; }
+    #idle-box i     { font-size: 56px; color: #e07b00; display: block; margin-bottom: 20px; }
+    #idle-box h2    { font-size: 28px; color: var(--gray-utility); margin-bottom: 10px; }
+    #idle-box p     { font-size: 17px; color: var(--gray-meta); line-height: 1.55; margin-bottom: 24px; }
+    #idle-countdown { font-size: 60px; font-weight: 700; color: var(--blue-header); line-height: 1; margin-bottom: 28px; }
     #idle-stay {
-      background-color: var(--blue-header);
-      color: var(--white);
-      border: none;
-      padding: 16px 44px;
-      border-radius: 6px;
-      font-size: 20px;
-      font-family: var(--font-ui);
-      font-weight: 600;
-      cursor: pointer;
+      background-color: var(--blue-header); color: var(--white); border: none;
+      padding: 16px 44px; border-radius: 6px; font-size: 20px;
+      font-family: var(--font-ui); font-weight: 600; cursor: pointer;
       transition: background-color 0.18s;
     }
     #idle-stay:hover { background-color: var(--blue-link-dark); }
@@ -108,602 +87,312 @@
        OFFLINE BANNER
        ============================================================ */
     #offline-banner {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background-color: #c0392b;
-      color: var(--white);
-      text-align: center;
-      padding: 13px 20px;
-      font-size: 16px;
-      font-weight: 600;
-      z-index: 9998;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      display: none; position: fixed; top: 0; left: 0; right: 0;
+      background-color: #c0392b; color: var(--white); text-align: center;
+      padding: 13px 20px; font-size: 16px; font-weight: 600;
+      z-index: 9998; box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
     #offline-banner.visible { display: block; }
 
     /* ============================================================
-       UTILITY BAR  (dark top strip)
+       UTILITY BAR — removed per kiosk requirements
        ============================================================ */
-    .utility-bar {
-      background-color: var(--gray-utility);
-      padding: 7px 0;
-    }
-    .utility-bar-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 18px;
-    }
-    .utility-bar a,
-    .utility-bar span {
-      color: rgba(255,255,255,0.78);
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .utility-bar a:hover { color: var(--white); }
-    .utility-sep { color: rgba(255,255,255,0.25); font-size: 13px; }
 
     /* ============================================================
-       SITE HEADER  — full-width solid blue, logo left, title right
+       SITE HEADER
        ============================================================ */
     .site-header {
       background-color: var(--blue-header);
-      display: flex;
-      align-items: center;
-      padding: 0 32px;
-      gap: 28px;
-      min-height: 90px;
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 28px; min-height: 90px;
     }
-
-    /* Logo placeholder — white Minneapolis City of Lakes logo on blue */
     .header-logo-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      /* Visual boundary between logo and title area — soft separator */
-      padding-right: 28px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding-right: 28px;
       border-right: 1px solid rgba(255,255,255,0.25);
     }
-
-    .header-logo-wrap img {
-      height: 58px;
-      width: auto;
-      object-fit: contain;
-      /* White logo on blue bg — no filter needed for whitelogo.png */
-    }
-
-    /* Kiosk title text */
-    .header-title-wrap {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
+    .header-logo-wrap img { height: 58px; width: auto; object-fit: contain; }
+    .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
     .header-title-wrap h1 {
-      color: var(--white);
-      font-size: 26px;
-      font-weight: 600;
-      line-height: 1.2;
-      margin-bottom: 3px;
+      color: var(--white); font-size: 26px; font-weight: 600;
+      line-height: 1.2; margin-bottom: 3px;
     }
-    .header-title-wrap p {
-      color: rgba(255,255,255,0.78);
-      font-size: 15px;
-      font-weight: 400;
-    }
+    .header-title-wrap p { color: rgba(255,255,255,0.78); font-size: 15px; font-weight: 400; }
 
     /* ============================================================
        BREADCRUMB BAR
        ============================================================ */
     .breadcrumb-bar {
       background-color: var(--white);
-      border-bottom: 1px solid var(--gray-divider);
-      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-divider); padding: 10px 0;
     }
     .breadcrumb-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
+      max-width: 1400px; margin: 0 auto; padding: 0 32px;
+      display: flex; align-items: center; gap: 6px; font-size: 14px;
     }
-    .breadcrumb-inner a        { color: var(--blue-link); }
-    .breadcrumb-inner a:hover  { text-decoration: underline; }
-    .breadcrumb-sep            { color: var(--gray-meta); font-size: 13px; }
-    .breadcrumb-current        { color: var(--gray-body); font-weight: 600; }
+    .breadcrumb-inner a       { color: var(--blue-link); }
+    .breadcrumb-inner a:hover { text-decoration: underline; }
+    .breadcrumb-sep     { color: var(--gray-meta); font-size: 13px; }
+    .breadcrumb-current { color: var(--gray-body); font-weight: 600; }
 
     /* ============================================================
-       PAGE HERO  (intro text — white section)
+       PAGE HERO
        ============================================================ */
-    .page-hero {
-      background-color: var(--white);
-      padding: 36px 0 28px;
-    }
-    .page-hero-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-    }
+    .page-hero { background-color: var(--white); padding: 36px 0 28px; }
+    .page-hero-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
     .page-hero-inner h2 {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--gray-utility);
-      margin-bottom: 10px;
-      line-height: 1.2;
+      font-size: 36px; font-weight: 700; color: var(--gray-utility);
+      margin-bottom: 10px; line-height: 1.2;
     }
     .page-hero-inner > p {
-      font-size: 17px;
-      color: var(--gray-meta);
-      line-height: 1.6;
+      font-size: 17px; color: var(--gray-meta); line-height: 1.6; max-width: 700px;
+    }
+
+    /* Mission bullet list in page hero */
+    .hero-list {
+      list-style: none;
+      margin-top: 16px;
       max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hero-list li {
+      font-size: 16px;
+      color: var(--gray-body);
+      line-height: 1.5;
+      padding-left: 22px;
+      position: relative;
+    }
+    .hero-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--green-icon-lt);
+      border-radius: 50%;
     }
 
     /* ============================================================
        CITY WEBSITE HERO BANNER
-       Mirrors the "Things to Do" banner: atmospheric dark bg,
-       white overlay card on the right with the prominent CTA.
+       Minneapolis green civic gradient — uses the same green family
+       as the icon tiles, feels cohesive and welcoming. Subtle
+       diagonal grid overlay adds texture without needing an image.
        ============================================================ */
     .city-hero-banner {
       position: relative;
       width: 100%;
-      /* Atmospheric Minneapolis gradient — dark violet-blue dusk */
-      background:
-        linear-gradient(
-          100deg,
-          #0d1f3c 0%,
-          #1a3560 30%,
-          #1e4a7a 55%,
-          #2d3b5e 75%,
-          #1a2840 100%
-        );
+      background: linear-gradient(
+        110deg,
+        #5a6b12 0%,
+        #6e8018 25%,
+        #8a9a1e 55%,
+        #7a8c1a 80%,
+        #5a6b12 100%
+      );
       overflow: hidden;
       min-height: 220px;
       display: flex;
       align-items: stretch;
     }
 
-    /* Subtle city-lights shimmer layer */
+    /* Diagonal grid texture — city-block feel */
     .city-hero-banner::before {
       content: '';
       position: absolute;
       inset: 0;
-      background:
-        radial-gradient(ellipse 60% 80% at 35% 60%, rgba(255,180,60,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(100,160,255,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 70% at 65% 50%, rgba(80,120,200,0.12) 0%, transparent 65%);
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
       pointer-events: none;
     }
 
-    /* Faint horizontal city-light streak near horizon */
+    /* Soft radial highlight — gives depth without drama */
     .city-hero-banner::after {
       content: '';
       position: absolute;
-      left: 0; right: 0;
-      bottom: 30%;
-      height: 1px;
-      background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(255,200,100,0.15) 20%,
-        rgba(255,220,140,0.25) 50%,
-        rgba(255,200,100,0.15) 80%,
-        transparent 100%
-      );
+      inset: 0;
+      background: radial-gradient(ellipse 70% 120% at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 65%);
       pointer-events: none;
     }
-
-    /* Left atmospheric content — banner text */
-    .banner-left {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 36px 40px 36px 32px;
-      position: relative;
-      z-index: 1;
-      max-width: 1400px;
-      margin: 0 auto;
-      /* This is a bit of a trick — the whole inner is flex,
-         and the white card is absolutely positioned on the right */
-    }
-
     .banner-inner {
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 32px;
-      display: flex;
-      align-items: stretch;
-      position: relative;
-      z-index: 1;
-      min-height: 220px;
+      max-width: 1400px; width: 100%; margin: 0 auto; padding: 0 32px;
+      display: flex; align-items: stretch; position: relative; z-index: 1; min-height: 220px;
     }
-
     .banner-text-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 36px 0;
-      padding-right: 360px; /* reserve space for the white card */
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      padding: 36px 0; padding-right: 360px;
     }
-
     .banner-eyebrow {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
-      margin-bottom: 10px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.70); margin-bottom: 10px;
     }
-
-    .banner-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.3;
-      margin-bottom: 8px;
-    }
-
-    .banner-subtitle {
-      font-size: 15px;
-      color: rgba(255,255,255,0.72);
-      line-height: 1.55;
-      max-width: 480px;
-    }
-
-    /* White overlay card — right side, mirrors the city site treatment */
+    .banner-title { font-size: 28px; font-weight: 700; color: var(--white); line-height: 1.3; margin-bottom: 8px; }
+    .banner-subtitle { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.55; max-width: 480px; }
     .banner-cta-card {
-      position: absolute;
-      right: 32px;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: var(--white);
-      border-radius: 3px;
-      padding: 36px 32px;
-      width: 320px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.28);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: inherit;
+      position: absolute; right: 32px; top: 50%; transform: translateY(-50%);
+      background-color: var(--white); border-radius: 3px; padding: 36px 32px; width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.28); text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      text-decoration: none; color: inherit;
       transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
-    /* Nudge so the card doesn't overlap the absolute transform */
-    .banner-cta-card:hover,
-    .banner-cta-card:focus {
+    .banner-cta-card:hover, .banner-cta-card:focus {
       box-shadow: 0 12px 40px rgba(0,0,0,0.38);
-      transform: translateY(calc(-50% - 3px));
-      outline: none;
+      transform: translateY(calc(-50% - 3px)); outline: none;
     }
-
     .banner-cta-card .cta-icon {
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       background: linear-gradient(145deg, var(--blue-header), var(--blue-link-dark));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 4px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
     }
-    .banner-cta-card .cta-icon i {
-      font-size: 24px;
-      color: var(--white);
-    }
-
-    .banner-cta-card h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gray-utility);
-      line-height: 1.3;
-    }
-
-    .banner-cta-card p {
-      font-size: 13px;
-      color: var(--gray-meta);
-      line-height: 1.5;
-    }
-
+    .banner-cta-card .cta-icon i { font-size: 24px; color: var(--white); }
+    .banner-cta-card h3 { font-size: 18px; font-weight: 700; color: var(--gray-utility); line-height: 1.3; }
+    .banner-cta-card p  { font-size: 13px; color: var(--gray-meta); line-height: 1.5; }
     .banner-cta-card .cta-link-text {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--blue-link);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-      border-bottom: 2px solid transparent;
-      padding-bottom: 2px;
+      font-size: 15px; font-weight: 700; color: var(--blue-link);
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 4px; border-bottom: 2px solid transparent; padding-bottom: 2px;
       transition: border-color 0.18s;
     }
-    .banner-cta-card:hover .cta-link-text {
-      border-bottom-color: var(--blue-link);
-    }
+    .banner-cta-card:hover .cta-link-text { border-bottom-color: var(--blue-link); }
 
     /* ============================================================
-       RESOURCES SECTION  ("I want to" — light gray)
+       RESOURCES SECTION
        ============================================================ */
     .resources-section {
-      background-color: var(--gray-section);
-      padding: 36px 0 40px;
-      border-top: 1px solid var(--gray-divider);
-      border-bottom: 1px solid var(--gray-divider);
+      background-color: var(--gray-section); padding: 36px 0 40px;
+      border-top: 1px solid var(--gray-divider); border-bottom: 1px solid var(--gray-divider);
     }
-    .resources-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-    }
-    .section-heading {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--gray-utility);
-      margin-bottom: 24px;
-    }
-
-    /* 3 × 2 card grid */
-    .resource-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
+    .resources-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .section-heading { font-size: 22px; font-weight: 700; color: var(--gray-utility); margin-bottom: 24px; }
+    .resource-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .resource-card {
-      background-color: var(--white);
-      border: 1px solid var(--gray-divider);
-      border-radius: 4px;
-      padding: 32px 24px 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      text-decoration: none;
-      color: var(--gray-body);
-      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s;
-      cursor: pointer;
+      background-color: var(--white); border: 1px solid var(--gray-divider); border-radius: 4px;
+      padding: 32px 24px 28px; display: flex; flex-direction: column;
+      align-items: center; text-align: center; text-decoration: none; color: var(--gray-body);
+      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s; cursor: pointer;
     }
-    .resource-card:hover,
-    .resource-card:focus {
-      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
-      transform: translateY(-3px);
-      border-color: #b0b8c0;
-      outline: none;
+    .resource-card:hover, .resource-card:focus {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12); transform: translateY(-3px);
+      border-color: #b0b8c0; outline: none;
     }
     .resource-card:active { transform: translateY(-1px); }
-
-    /* Green icon tile — matches the city site */
     .card-icon-tile {
-      width: 72px;
-      height: 72px;
+      width: 72px; height: 72px;
       background: linear-gradient(145deg, var(--green-icon-lt), var(--green-icon));
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(138,154,30,0.28);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(138,154,30,0.28);
       transition: box-shadow 0.2s;
     }
-    .resource-card:hover .card-icon-tile {
-      box-shadow: 0 4px 14px rgba(138,154,30,0.42);
-    }
+    .resource-card:hover .card-icon-tile { box-shadow: 0 4px 14px rgba(138,154,30,0.42); }
     .card-icon-tile i { font-size: 30px; color: var(--white); }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--blue-link);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
+    .card-title { font-size: 18px; font-weight: 700; color: var(--blue-link); margin-bottom: 8px; line-height: 1.3; }
     .resource-card:hover .card-title { text-decoration: underline; }
-
-    .card-desc {
-      font-size: 14px;
-      color: var(--gray-meta);
-      line-height: 1.55;
-    }
+    .card-desc { font-size: 14px; color: var(--gray-meta); line-height: 1.55; }
 
     /* ============================================================
-       LANGUAGE ASSISTANCE SECTION
+       LANGUAGE SECTION
        ============================================================ */
-    .lang-section {
-      background-color: var(--white);
-      padding: 36px 0 40px;
-    }
-    .lang-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-    }
-    .lang-section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-    .lang-section-header h3 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--gray-utility);
-    }
-    .lang-section-header i {
-      font-size: 22px;
-      color: var(--blue-link);
-    }
-    .lang-section-sub {
-      font-size: 15px;
-      color: var(--gray-meta);
-      margin-bottom: 22px;
-    }
-
+    .lang-section { background-color: var(--white); padding: 36px 0 40px; }
+    .lang-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .lang-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .lang-section-header h3 { font-size: 22px; font-weight: 700; color: var(--gray-utility); }
+    .lang-section-header i { font-size: 22px; color: var(--blue-link); }
+    .lang-section-sub { font-size: 15px; color: var(--gray-meta); margin-bottom: 22px; }
     .lang-cards-row {
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--gray-divider) transparent;
+      display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
+      scrollbar-width: thin; scrollbar-color: var(--gray-divider) transparent;
       -webkit-overflow-scrolling: touch;
     }
     .lang-cards-row::-webkit-scrollbar { height: 5px; }
     .lang-cards-row::-webkit-scrollbar-track { background: transparent; }
-    .lang-cards-row::-webkit-scrollbar-thumb {
-      background-color: var(--gray-divider);
-      border-radius: 4px;
-    }
-
+    .lang-cards-row::-webkit-scrollbar-thumb { background-color: var(--gray-divider); border-radius: 4px; }
     .lang-card {
-      background-color: var(--white);
-      border: 1px solid var(--gray-divider);
-      border-top: 4px solid var(--blue-header);
-      border-radius: 4px;
-      padding: 16px 18px;
-      min-width: 220px;
-      max-width: 220px;
-      flex-shrink: 0;
+      background-color: var(--white); border: 1px solid var(--gray-divider);
+      border-top: 4px solid var(--blue-header); border-radius: 4px;
+      padding: 16px 18px; min-width: 220px; max-width: 220px; flex-shrink: 0;
     }
     .lang-name {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--blue-header);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
+      font-size: 11px; font-weight: 700; color: var(--blue-header);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
     }
-    .lang-card p {
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--gray-body);
-    }
-    .lang-card p strong {
-      display: block;
-      color: var(--gray-utility);
-      margin-bottom: 3px;
-      font-size: 13px;
-    }
+    .lang-card p { font-size: 13px; line-height: 1.5; color: var(--gray-body); }
+    .lang-card p strong { display: block; color: var(--gray-utility); margin-bottom: 3px; font-size: 13px; }
 
     /* ============================================================
-       FOOTER  — matches minneapolismn.gov footer treatment
-       Dark background, centered privacy/terms/accessibility links,
-       kiosk identifier text above the legal links.
+       FOOTER
        ============================================================ */
     .site-footer {
-      background-color: var(--gray-utility);
-      color: rgba(255,255,255,0.70);
-      /* Red top accent stripe — mirrors city site */
-      border-top: 4px solid var(--red-accent);
-      padding: 28px 32px 24px;
-      text-align: center;
+      background-color: var(--gray-utility); color: rgba(255,255,255,0.75);
+      padding: 28px 32px 24px; text-align: center;
     }
 
-    .footer-location-label {
-      font-size: 14px;
-      color: rgba(255,255,255,0.55);
-      margin-bottom: 10px;
-      letter-spacing: 0.03em;
+    /* Location block — centered, Lake Street pattern */
+    .footer-location { text-align: center; margin-bottom: 20px; }
+    .footer-logo-wrap { margin-bottom: 16px; }
+    .footer-logo-wrap img { height: 48px; width: auto; object-fit: contain; }
+    .footer-location h3 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 12px; }
+    .footer-location p {
+      font-size: 14px; line-height: 1.9; color: rgba(255,255,255,0.82); margin-bottom: 6px;
     }
-    .footer-location-label strong {
-      color: rgba(255,255,255,0.82);
-      font-size: 15px;
-    }
-
-    /* Thin divider between kiosk text and legal links */
-    .footer-rule {
-      border: none;
-      border-top: 1px solid rgba(255,255,255,0.12);
-      width: 320px;
-      margin: 14px auto;
-    }
-
-    .footer-links {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .footer-links a {
-      color: rgba(255,255,255,0.62);
-      font-size: 13px;
-      text-decoration: none;
+    .footer-location p strong { color: var(--white); }
+    .footer-holiday-link {
+      color: rgba(255,255,255,0.65); font-size: 13px; text-decoration: underline;
       transition: color 0.18s;
     }
+    .footer-holiday-link:hover { color: var(--white); }
+    .footer-contact { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.10); }
+    .footer-rule { border: none; border-top: 1px solid rgba(255,255,255,0.12); width: 320px; margin: 14px auto; }
+    .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,0.62); font-size: 13px; text-decoration: none; transition: color 0.18s; }
     .footer-links a:hover { color: var(--white); text-decoration: underline; }
-    .footer-links .sep    { color: rgba(255,255,255,0.22); font-size: 13px; }
-
-    .footer-copyright {
-      font-size: 12px;
-      color: rgba(255,255,255,0.38);
-      margin-top: 10px;
-    }
+    .footer-links .sep { color: rgba(255,255,255,0.22); font-size: 13px; }
+    .footer-copyright { font-size: 12px; color: rgba(255,255,255,0.38); margin-top: 10px; }
 
     /* ============================================================
-       ENTRANCE ANIMATIONS
+       ANIMATIONS
        ============================================================ */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .page-hero           { animation: fadeUp 0.4s ease-out both; }
-    .city-hero-banner    { animation: fadeUp 0.4s 0.08s ease-out both; }
+    .page-hero        { animation: fadeUp 0.4s ease-out both; }
+    .city-hero-banner { animation: fadeUp 0.4s 0.08s ease-out both; }
     .resource-card:nth-child(1) { animation: fadeUp 0.35s 0.10s ease-out both; }
     .resource-card:nth-child(2) { animation: fadeUp 0.35s 0.15s ease-out both; }
     .resource-card:nth-child(3) { animation: fadeUp 0.35s 0.20s ease-out both; }
     .resource-card:nth-child(4) { animation: fadeUp 0.35s 0.25s ease-out both; }
     .resource-card:nth-child(5) { animation: fadeUp 0.35s 0.30s ease-out both; }
     .resource-card:nth-child(6) { animation: fadeUp 0.35s 0.35s ease-out both; }
-    .lang-section        { animation: fadeUp 0.35s 0.40s ease-out both; }
+    .lang-section     { animation: fadeUp 0.35s 0.40s ease-out both; }
 
     /* ============================================================
-       RESPONSIVE — kiosk/iPad resolution scaling
+       RESPONSIVE
        ============================================================ */
     @media (max-width: 1366px) {
-      .site-header          { min-height: 78px; }
+      .site-header { min-height: 78px; }
       .header-logo-wrap img { height: 48px; }
       .header-title-wrap h1 { font-size: 22px; }
-      .page-hero-inner h2   { font-size: 30px; }
-      .banner-title         { font-size: 23px; }
-      .banner-text-col      { padding-right: 300px; }
-      .banner-cta-card      { width: 275px; padding: 28px 24px; right: 32px; }
-      .card-icon-tile       { width: 64px; height: 64px; }
-      .card-icon-tile i     { font-size: 26px; }
-      .card-title           { font-size: 16px; }
+      .page-hero-inner h2 { font-size: 30px; }
+      .banner-title { font-size: 23px; }
+      .banner-text-col { padding-right: 300px; }
+      .banner-cta-card { width: 275px; padding: 28px 24px; right: 32px; }
+      .card-icon-tile { width: 64px; height: 64px; }
+      .card-icon-tile i { font-size: 26px; }
+      .card-title { font-size: 16px; }
     }
-
     @media (max-width: 1024px) {
       .resource-grid { grid-template-columns: repeat(2, 1fr); }
       .banner-text-col { padding-right: 0; padding-bottom: 180px; }
-      .banner-cta-card {
-        width: calc(100% - 64px);
-        position: static;
-        transform: none;
-        margin-top: 20px;
-      }
+      .banner-cta-card { width: calc(100% - 64px); position: static; transform: none; margin-top: 20px; }
       .banner-inner { flex-direction: column; }
     }
-
-    /* ============================================================
-       PRINT
-       ============================================================ */
     @media print {
-      .site-header, .site-footer {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
+      .site-header, .site-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -729,46 +418,17 @@
   <!-- STOP: Offline Banner -->
 
 
-  <!-- START: Utility Bar -->
-  <div class="utility-bar" aria-hidden="true">
-    <div class="utility-bar-inner">
-      <span>
-        <i class="fa-solid fa-circle-info"></i>
-        For personal assistance, speak with staff at the service counter
-      </span>
-      <span class="utility-sep">|</span>
-      <a href="https://www.minneapolismn.gov/footer-content/website-accessibility/"
-         target="_blank" rel="noopener" tabindex="-1">
-        <i class="fa-solid fa-universal-access"></i> Accessibility
-      </a>
-    </div>
-  </div>
-  <!-- STOP: Utility Bar -->
-
-
   <!-- START: Site Header -->
-  <!--
-    Full-width solid blue bar.
-    Left:  Minneapolis "City of Lakes" logo (white version on blue bg).
-    Right: Kiosk title text.
-    No white box — same blue color edge to edge.
-  -->
   <header class="site-header" role="banner">
-
-    <!-- Logo placeholder — replace src with whitelogo.png at deployment -->
     <div class="header-logo-wrap">
-      <img src="whitelogo.png"
-           alt="City of Minneapolis — City of Lakes">
+      <img src="whitelogo.png" alt="City of Minneapolis — City of Lakes">
     </div>
-
     <div class="header-title-wrap">
       <h1>Public Service Center</h1>
       <p>City of Minneapolis — Resident Resource Kiosk</p>
     </div>
-
   </header>
   <!-- STOP: Site Header -->
-
 
   <!-- START: Breadcrumb Bar -->
   <nav class="breadcrumb-bar" aria-label="Breadcrumb">
@@ -782,152 +442,91 @@
   </nav>
   <!-- STOP: Breadcrumb Bar -->
 
-
-  <!-- START: Page Hero (intro text) -->
+  <!-- START: Page Hero -->
   <section class="page-hero" aria-label="Page introduction">
     <div class="page-hero-inner">
       <h2>Public Service Center</h2>
       <p>
-        Welcome to the City of Minneapolis Public Service Center kiosk. Select a service
-        below to get started, or visit the full city website for all available resources.
-        For personal assistance, please speak with staff at the service counter.
+        The City of Minneapolis Service Center provides information and services to everyone.
+        Our approach is to provide straightforward and accessible services.
       </p>
+      <ul class="hero-list" aria-label="Our commitments">
+        <li>Remove language barriers</li>
+        <li>Accommodate disabilities</li>
+        <li>Provide services and information to fulfill our diverse community needs</li>
+        <li>Make it easy for you to receive our services, whether you know the City's organization or not</li>
+      </ul>
     </div>
   </section>
   <!-- STOP: Page Hero -->
 
-
   <!-- START: City Website Hero Banner -->
-  <!--
-    Atmospheric dark-blue banner mimicking the "Things to Do" skyline treatment.
-    White overlay card on the right contains the prominent City of Minneapolis CTA.
-  -->
   <div class="city-hero-banner" aria-label="City of Minneapolis website">
     <div class="banner-inner">
-
-      <!-- Left: atmospheric text -->
       <div class="banner-text-col">
         <p class="banner-eyebrow">Official City Resource</p>
         <h2 class="banner-title">Looking for something<br>not listed here?</h2>
-        <p class="banner-subtitle">
-          The full City of Minneapolis website has everything — permits, payments,
-          programs, and services for every resident.
-        </p>
+        <p class="banner-subtitle">The full City of Minneapolis website has everything — permits, payments, programs, and services for every resident.</p>
       </div>
-
-      <!-- Right: white overlay CTA card -->
-      <a href="https://www.minneapolismn.gov/"
-         class="banner-cta-card"
-         target="_blank"
-         rel="noopener"
-         aria-label="Visit the City of Minneapolis website">
-
-        <div class="cta-icon" aria-hidden="true">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-
+      <a href="https://www.minneapolismn.gov/" class="banner-cta-card" target="_blank" rel="noopener" aria-label="Visit the City of Minneapolis website">
+        <div class="cta-icon" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></div>
         <h3>Explore the full City of Minneapolis website</h3>
-
         <p>Access all city services, departments, payments, and programs in one place.</p>
-
-        <span class="cta-link-text">
-          Visit minneapolismn.gov
-          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-        </span>
-
+        <span class="cta-link-text">Visit minneapolismn.gov <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
       </a>
-
     </div>
   </div>
   <!-- STOP: City Website Hero Banner -->
 
-
-  <!-- START: Resources Section ("I want to") -->
+  <!-- START: Resources Section -->
   <section class="resources-section" aria-label="Available services">
     <div class="resources-inner">
       <h2 class="section-heading">I want to&hellip;</h2>
-
       <div class="resource-grid">
 
-        <!-- START: Card 1 — Public Data Requests -->
-        <a href="https://www.minneapolismn.gov/government/government-data/request-public-data/"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="Request public data from the City of Minneapolis">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-folder-open"></i>
-          </div>
+        <!-- START: Card 1 -->
+        <a href="https://www.minneapolismn.gov/government/government-data/request-public-data/" class="resource-card" target="_blank" rel="noopener" aria-label="Request public data">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div>
           <span class="card-title">Request public data</span>
           <p class="card-desc">Submit a request to access public government data and records.</p>
         </a>
         <!-- STOP: Card 1 -->
 
-        <!-- START: Card 2 — Civil Rights Complaint -->
-        <a href="https://www2.minneapolismn.gov/government/departments/civil-rights/"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="File a civil rights complaint">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-scale-balanced"></i>
-          </div>
+        <!-- START: Card 2 -->
+        <a href="https://www2.minneapolismn.gov/government/departments/civil-rights/" class="resource-card" target="_blank" rel="noopener" aria-label="File a civil rights complaint">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div>
           <span class="card-title">File a civil rights complaint</span>
           <p class="card-desc">Report a civil rights violation or file a discrimination complaint.</p>
         </a>
         <!-- STOP: Card 2 -->
 
-        <!-- START: Card 3 — Procurement -->
-        <a href="https://www.minneapolismn.gov/government/departments/finance/what-we-do/procurement/"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="View city procurement opportunities">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-briefcase"></i>
-          </div>
+        <!-- START: Card 3 -->
+        <a href="https://www.minneapolismn.gov/government/departments/finance/what-we-do/procurement/" class="resource-card" target="_blank" rel="noopener" aria-label="View city procurement">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-briefcase"></i></div>
           <span class="card-title">View city procurement</span>
           <p class="card-desc">Find bids, contracts, and vendor opportunities with the City of Minneapolis.</p>
         </a>
         <!-- STOP: Card 3 -->
 
-        <!-- START: Card 4 — Online Appeal -->
-        <a href="https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="Submit an online appeal">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-file-pen"></i>
-          </div>
+        <!-- START: Card 4 -->
+        <a href="https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/" class="resource-card" target="_blank" rel="noopener" aria-label="Submit an online appeal">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-file-pen"></i></div>
           <span class="card-title">Submit an online appeal</span>
           <p class="card-desc">File an administrative appeal for a city decision or citation online.</p>
         </a>
         <!-- STOP: Card 4 -->
 
-        <!-- START: Card 5 — ProjectDox -->
-        <a href="https://pdx.minneapolismn.gov/ProjectDox/index.aspx"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="Access ProjectDox ePlan Review">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-drafting-compass"></i>
-          </div>
+        <!-- START: Card 5 -->
+        <a href="https://pdx.minneapolismn.gov/ProjectDox/index.aspx" class="resource-card" target="_blank" rel="noopener" aria-label="Access ProjectDox ePlan Review">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-drafting-compass"></i></div>
           <span class="card-title">ePlan review — ProjectDox</span>
           <p class="card-desc">Submit and track electronic plan reviews for permits and inspections.</p>
         </a>
         <!-- STOP: Card 5 -->
 
-        <!-- START: Card 6 — Metro Transit -->
-        <a href="https://store.metrotransit.org/"
-           class="resource-card"
-           target="_blank"
-           rel="noopener"
-           aria-label="Get a Metro Transit Go-To Card">
-          <div class="card-icon-tile" aria-hidden="true">
-            <i class="fa-solid fa-bus"></i>
-          </div>
+        <!-- START: Card 6 -->
+        <a href="https://store.metrotransit.org/" class="resource-card" target="_blank" rel="noopener" aria-label="Get a Metro Transit Go-To Card">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-bus"></i></div>
           <span class="card-title">Get a Metro Transit Go-To Card</span>
           <p class="card-desc">Order or reload your Go-To Card for bus and rail travel.</p>
         </a>
@@ -938,90 +537,85 @@
   </section>
   <!-- STOP: Resources Section -->
 
-
   <!-- START: Language Assistance Section -->
   <section class="lang-section" aria-label="Multilingual assistance">
     <div class="lang-inner">
-
       <div class="lang-section-header">
         <i class="fa-solid fa-language" aria-hidden="true"></i>
         <h3>Need help?</h3>
       </div>
-
-      <p class="lang-section-sub">
-        Please speak with staff at the service counter. Assistance is available in multiple languages.
-      </p>
-
+      <p class="lang-section-sub">Please speak with staff at the service counter. Assistance is available in multiple languages.</p>
       <div class="lang-cards-row" role="list">
-
         <div class="lang-card" role="listitem" lang="es">
           <div class="lang-name">Spanish / Español</div>
-          <p><strong>¿Necesita ayuda en persona?</strong>
-          Por favor hable con el personal en el mostrador de servicio.</p>
+          <p><strong>¿Necesita ayuda en persona?</strong> Por favor hable con el personal en el mostrador de servicio.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="so">
           <div class="lang-name">Somali / Soomaali</div>
-          <p><strong>Ma u baahan tahay caawimaad shaqsiyeed?</strong>
-          Fadlan la hadal wakiilka adeegga ee jooga miiska.</p>
+          <p><strong>Ma u baahan tahay caawimaad shaqsiyeed?</strong> Fadlan la hadal wakiilka adeegga ee jooga miiska.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="hmn">
           <div class="lang-name">Hmong / Hmoob</div>
-          <p><strong>Xav tau kev pab tus kheej?</strong>
-          Thov nrog ib tus neeg pabcuam tham ntawm lub txee.</p>
+          <p><strong>Xav tau kev pab tus kheej?</strong> Thov nrog ib tus neeg pabcuam tham ntawm lub txee.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="vi">
           <div class="lang-name">Vietnamese / Tiếng Việt</div>
-          <p><strong>Bạn cần hỗ trợ trực tiếp?</strong>
-          Vui lòng nói chuyện với nhân viên phục vụ tại quầy.</p>
+          <p><strong>Bạn cần hỗ trợ trực tiếp?</strong> Vui lòng nói chuyện với nhân viên phục vụ tại quầy.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="lo">
           <div class="lang-name">Lao / ລາວ</div>
-          <p><strong>ຕ້ອງການການຊ່ວຍເຫຼືອສ່ວນຕົວບໍ?</strong>
-          ກະລຸນາເວົ້າກັບພະນັກງານບໍລິການທີ່ເຄົາເຕີ.</p>
+          <p><strong>ຕ້ອງການການຊ່ວຍເຫຼືອສ່ວນຕົວບໍ?</strong> ກະລຸນາເວົ້າກັບພະນັກງານບໍລິການທີ່ເຄົາເຕີ.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="ko">
           <div class="lang-name">Korean / 한국어</div>
-          <p><strong>개인 도움이 필요하신가요?</strong>
-          카운터에 있는 서비스 담당자에게 말씀해 주세요.</p>
+          <p><strong>개인 도움이 필요하신가요?</strong> 카운터에 있는 서비스 담당자에게 말씀해 주세요.</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="zh-Hant">
           <div class="lang-name">Chinese / 中文</div>
-          <p><strong>需要個人協助嗎？</strong>
-          請在櫃檯與服務人員交談。</p>
+          <p><strong>需要個人協助嗎？</strong> 請在櫃檯與服務人員交談。</p>
         </div>
-
         <div class="lang-card" role="listitem" lang="am">
           <div class="lang-name">Amharic / አማርኛ</div>
-          <p><strong>የግል ድጋፍ ያስፈልግዎታል?</strong>
-          እባክዎን በአገልግሎት ቆጠቢ ውስጥ ካሉ ሠራተኞች ጋር ይነጋገሩ።</p>
+          <p><strong>የግል ድጋፍ ያስፈልግዎታል?</strong> እባክዎን በአገልግሎት ቆጠቢ ውስጥ ካሉ ሠራተኞች ጋር ይነጋገሩ።</p>
         </div>
-
       </div>
     </div>
   </section>
   <!-- STOP: Language Assistance Section -->
 
-
   <!-- START: Footer -->
   <!--
-    Matches minneapolismn.gov footer:
-    - Dark charcoal background
-    - Red top accent stripe
-    - Kiosk identifier text centered above the rule
-    - Privacy | Terms of Use | Accessibility centered below the rule
-    - Copyright line at bottom
+    Matches minneapolismn.gov footer — Lake Street format applied to PSC.
+    Logo, location name, address/hours/phone centered, rule, legal links.
   -->
   <footer class="site-footer" role="contentinfo">
 
-    <p class="footer-location-label">
-      <strong>City of Minneapolis</strong> — Public Service Center Kiosk
-    </p>
+    <div class="footer-location">
+      <div class="footer-logo-wrap">
+        <img src="whitelogo.png" alt="City of Minneapolis">
+      </div>
+
+      <h3>City of Minneapolis Public Service Center</h3>
+
+      <p>
+        <strong>Address:</strong> 505 Fourth Avenue South, Skyway Level, Minneapolis, MN 55415
+      </p>
+
+      <p>
+        <strong>Hours:</strong><br>
+        Monday – Thursday: 8:00 a.m. – 4:00 p.m.<br>
+        Friday: 9:00 a.m. – 4:00 p.m.<br>
+        <a href="https://www.minneapolismn.gov/contact-us/building-locations/city-holidays/"
+           target="_blank" rel="noopener" class="footer-holiday-link">
+          View city holidays
+        </a>
+      </p>
+
+      <p class="footer-contact">
+        <strong>Phone:</strong> 311 or 612-673-3000<br>
+        <strong>Relay Service:</strong> 612-673-3000
+      </p>
+    </div>
 
     <hr class="footer-rule" aria-hidden="true">
 
@@ -1041,111 +635,43 @@
   </footer>
   <!-- STOP: Footer -->
 
-
   <!-- ============================================================
        SELF-HEALING SCRIPTS
-       1. Inactivity timer   — idle → warning overlay → hard reload
-       2. Page visibility    — screen-wake resets idle clock
-       3. Network watchdog   — offline banner + auto-reload on reconnect
-       4. Periodic health    — background HEAD ping; reload on failure
-       5. Interaction blocks — prevent context menu & text selection
        ============================================================ -->
   <script>
-    /* ── 1. INACTIVITY TIMER ─────────────────────────────────────── */
-    let idleWarnTimer;
-    let idleReloadTimer;
-    let countdownInterval;
-    let countdownVal = 30;
-
-    function startIdleTimers() {
-      idleWarnTimer = setTimeout(showIdleWarning, IDLE_WARN_MS);
-    }
-
+    let idleWarnTimer, idleReloadTimer, countdownInterval, countdownVal = 30;
+    function startIdleTimers() { idleWarnTimer = setTimeout(showIdleWarning, IDLE_WARN_MS); }
     function resetIdleTimers() {
-      clearTimeout(idleWarnTimer);
-      clearTimeout(idleReloadTimer);
-      clearInterval(countdownInterval);
-      hideIdleWarning();
-      startIdleTimers();
+      clearTimeout(idleWarnTimer); clearTimeout(idleReloadTimer); clearInterval(countdownInterval);
+      hideIdleWarning(); startIdleTimers();
     }
-
     function showIdleWarning() {
       countdownVal = Math.round((IDLE_RELOAD_MS - IDLE_WARN_MS) / 1000);
       document.getElementById('idle-countdown').textContent = countdownVal;
       document.getElementById('idle-overlay').classList.add('visible');
-
       countdownInterval = setInterval(function() {
         countdownVal--;
         document.getElementById('idle-countdown').textContent = countdownVal;
-        if (countdownVal <= 0) {
-          clearInterval(countdownInterval);
-          window.location.href = KIOSK_HOME_URL;
-        }
+        if (countdownVal <= 0) { clearInterval(countdownInterval); window.location.href = KIOSK_HOME_URL; }
       }, 1000);
-
-      idleReloadTimer = setTimeout(function() {
-        window.location.href = KIOSK_HOME_URL;
-      }, IDLE_RELOAD_MS - IDLE_WARN_MS + 1000);
+      idleReloadTimer = setTimeout(function() { window.location.href = KIOSK_HOME_URL; }, IDLE_RELOAD_MS - IDLE_WARN_MS + 1000);
     }
-
-    function hideIdleWarning() {
-      document.getElementById('idle-overlay').classList.remove('visible');
-      clearInterval(countdownInterval);
-    }
-
+    function hideIdleWarning() { document.getElementById('idle-overlay').classList.remove('visible'); clearInterval(countdownInterval); }
     function cancelIdle() { resetIdleTimers(); }
-
-    ['click', 'touchstart', 'touchend', 'keydown', 'mousemove', 'scroll'].forEach(function(evt) {
-      document.addEventListener(evt, resetIdleTimers, { passive: true });
-    });
-
+    ['click','touchstart','touchend','keydown','mousemove','scroll'].forEach(function(e) { document.addEventListener(e, resetIdleTimers, {passive:true}); });
     startIdleTimers();
-
-
-    /* ── 2. PAGE VISIBILITY ──────────────────────────────────────── */
-    document.addEventListener('visibilitychange', function() {
-      if (document.visibilityState === 'visible') { resetIdleTimers(); }
-    });
-
-
-    /* ── 3. NETWORK WATCHDOG ─────────────────────────────────────── */
+    document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') resetIdleTimers(); });
     var offlineBanner = document.getElementById('offline-banner');
-
-    window.addEventListener('offline', function() {
-      offlineBanner.classList.add('visible');
-    });
-
-    window.addEventListener('online', function() {
-      offlineBanner.classList.remove('visible');
-      setTimeout(function() { window.location.href = KIOSK_HOME_URL; }, 2000);
-    });
-
+    window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });
+    window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); setTimeout(function() { window.location.href = KIOSK_HOME_URL; }, 2000); });
     if (!navigator.onLine) { offlineBanner.classList.add('visible'); }
-
-
-    /* ── 4. PERIODIC HEALTH CHECK ────────────────────────────────── */
     setInterval(function() {
-      fetch(HEALTH_CHECK_URL, { method: 'HEAD', cache: 'no-store' })
-        .then(function(res) {
-          if (!res.ok) throw new Error('health-check-fail');
-          offlineBanner.classList.remove('visible');
-        })
-        .catch(function() {
-          offlineBanner.classList.add('visible');
-        });
+      fetch(HEALTH_CHECK_URL, {method:'HEAD',cache:'no-store'})
+        .then(function(r) { if (!r.ok) throw new Error(); offlineBanner.classList.remove('visible'); })
+        .catch(function() { offlineBanner.classList.add('visible'); });
     }, HEALTH_CHECK_MS);
-
-
-    /* ── 5. INTERACTION BLOCKS ───────────────────────────────────── */
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-    document.addEventListener('selectstart',  function(e) { e.preventDefault(); });
-
-    document.querySelectorAll('a.resource-card').forEach(function(card) {
-      card.addEventListener('click', function() {
-        var t = this.querySelector('.card-title');
-        if (t) { console.log('[Kiosk] Resource accessed:', t.textContent.trim()); }
-      });
-    });
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
   </script>
 
 </body>
