@@ -3,17 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome — City of Minneapolis Public Service Center</title>
+  <title>Public Service Center — City of Minneapolis</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!--
-    NO IDLE TIMER on this page — intentional.
-    This attract/welcome screen displays indefinitely.
-    All self-healing and idle logic lives in kiosk.html only.
-  -->
+  <!-- ============================================================
+       SELF-HEALING CONFIGURATION
+       Adjust timing constants here only — do not edit script logic.
+       ============================================================ -->
+  <script>
+    const KIOSK_HOME_URL   = 'index.html';  // ← returns to attract screen, not this page
+    const IDLE_WARN_MS     = 840000;  // 14 min  → show 60-second warning overlay
+    const IDLE_RELOAD_MS   = 900000;  // 15 min  → redirect back to index.html
+    const HEALTH_CHECK_MS  = 60000;   // 1 min   → periodic connectivity ping
+    const HEALTH_CHECK_URL = 'https://www.minneapolismn.gov/';
+  </script>
 
   <style>
     /* ============================================================
@@ -21,465 +27,627 @@
        ============================================================ */
     :root {
       --blue-header:    #1e6fa8;
-      --blue-deep:      #15558a;
-      --blue-darker:    #0e3d66;
+      --blue-link:      #1a6faf;
+      --blue-link-dark: #15558a;
+      --red-accent:     #cc2200;
       --green-icon:     #8a9a1e;
       --green-icon-lt:  #a2b427;
-      --green-btn-dark: #556514;
       --gray-utility:   #2d2d2d;
       --gray-divider:   #d0ccc8;
+      --gray-section:   #eceff1;
       --gray-body:      #4a4a4a;
       --gray-meta:      #717171;
       --white:          #ffffff;
       --font-ui: 'Myriad Pro', Calibri, 'Trebuchet MS', Arial, sans-serif;
     }
 
-    /* ============================================================
-       RESET & BASE — full-viewport, no scroll
-       ============================================================ */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
-
+    html { scroll-behavior: smooth; }
     body {
       font-family: var(--font-ui);
+      color: var(--gray-body);
+      background-color: var(--white);
       -webkit-user-select: none;
       user-select: none;
+      -ms-touch-action: manipulation;
       touch-action: manipulation;
-      display: flex;
-      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
-
     a { color: inherit; text-decoration: none; }
+    a:focus-visible { outline: 3px solid var(--blue-link); outline-offset: 2px; }
 
     /* ============================================================
-       LAYOUT — two panels + thin divider seam + bottom bar
-       Top panel: 58% — blue, logo, text, button
-       Bottom panel: 42% — white, seal watermark, languages
+       IDLE WARNING OVERLAY
        ============================================================ */
-    .panel-top {
-      flex: 0 0 58%;
+    #idle-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.70); z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #idle-overlay.visible { display: flex; }
+    #idle-box {
+      background: var(--white); border-radius: 14px; padding: 52px 60px;
+      text-align: center; max-width: 520px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    #idle-box i     { font-size: 56px; color: #e07b00; display: block; margin-bottom: 20px; }
+    #idle-box h2    { font-size: 28px; color: var(--gray-utility); margin-bottom: 10px; }
+    #idle-box p     { font-size: 17px; color: var(--gray-meta); line-height: 1.55; margin-bottom: 24px; }
+    #idle-countdown { font-size: 60px; font-weight: 700; color: var(--blue-header); line-height: 1; margin-bottom: 28px; }
+    #idle-stay {
+      background-color: var(--blue-header); color: var(--white); border: none;
+      padding: 16px 44px; border-radius: 6px; font-size: 20px;
+      font-family: var(--font-ui); font-weight: 600; cursor: pointer;
+      transition: background-color 0.18s;
+    }
+    #idle-stay:hover { background-color: var(--blue-link-dark); }
+
+    /* ============================================================
+       OFFLINE BANNER
+       ============================================================ */
+    #offline-banner {
+      display: none; position: fixed; top: 0; left: 0; right: 0;
+      background-color: #c0392b; color: var(--white); text-align: center;
+      padding: 13px 20px; font-size: 16px; font-weight: 600;
+      z-index: 9998; box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    #offline-banner.visible { display: block; }
+
+    /* ============================================================
+       UTILITY BAR — removed per kiosk requirements
+       ============================================================ */
+
+    /* ============================================================
+       SITE HEADER
+       ============================================================ */
+    .site-header {
       background-color: var(--blue-header);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 36px 60px 28px;
-      overflow: hidden;
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 28px; min-height: 90px;
+    }
+    .header-logo-wrap {
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding-right: 28px;
+      border-right: 1px solid rgba(255,255,255,0.25);
+    }
+    .header-logo-wrap img { height: 58px; width: auto; object-fit: contain; }
+    .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
+    .header-title-wrap h1 {
+      color: var(--white); font-size: 26px; font-weight: 600;
+      line-height: 1.2; margin-bottom: 3px;
+    }
+    .header-title-wrap p { color: rgba(255,255,255,0.78); font-size: 15px; font-weight: 400; }
+
+    /* ============================================================
+       BREADCRUMB BAR — removed per kiosk requirements
+       ============================================================ */
+
+    /* ============================================================
+       PAGE HERO
+       ============================================================ */
+    .page-hero { background-color: var(--white); padding: 36px 0 28px; }
+    .page-hero-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .page-hero-inner h2 {
+      font-size: 36px; font-weight: 700; color: var(--gray-utility);
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .page-hero-inner > p {
+      font-size: 17px; color: var(--gray-meta); line-height: 1.6; max-width: 700px;
     }
 
-    .panel-bottom {
-      flex: 0 0 42%;
-      background-color: var(--white);
-      position: relative;
+    /* Mission bullet list in page hero */
+    .hero-list {
+      list-style: none;
+      margin-top: 16px;
+      max-width: 700px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 22px 60px 0;
-      overflow: hidden;
+      gap: 8px;
+    }
+    .hero-list li {
+      font-size: 16px;
+      color: var(--gray-body);
+      line-height: 1.5;
+      padding-left: 22px;
+      position: relative;
+    }
+    .hero-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--green-icon-lt);
+      border-radius: 50%;
     }
 
     /* ============================================================
-       PANEL TOP OVERLAYS — faint diagonal grid + radial glow
-       Adds depth to the solid blue field without image assets.
+       CITY WEBSITE HERO BANNER
+       Minneapolis green civic gradient — uses the same green family
+       as the icon tiles, feels cohesive and welcoming. Subtle
+       diagonal grid overlay adds texture without needing an image.
        ============================================================ */
-    .panel-top::before {
+    .city-hero-banner {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(
+        110deg,
+        #5a6b12 0%,
+        #6e8018 25%,
+        #8a9a1e 55%,
+        #7a8c1a 80%,
+        #5a6b12 100%
+      );
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    /* Diagonal grid texture — city-block feel */
+    .city-hero-banner::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(45deg,  rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(-45deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
+        linear-gradient(45deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
       pointer-events: none;
     }
-    .panel-top::after {
+
+    /* Soft radial highlight — gives depth without drama */
+    .city-hero-banner::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 80% 100% at 50% 40%,
-        rgba(255,255,255,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse 70% 120% at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 65%);
       pointer-events: none;
     }
+    .banner-inner {
+      max-width: 1400px; width: 100%; margin: 0 auto; padding: 0 32px;
+      display: flex; align-items: stretch; position: relative; z-index: 1; min-height: 220px;
+    }
+    .banner-text-col {
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      padding: 36px 0; padding-right: 360px;
+    }
+    .banner-eyebrow {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.70); margin-bottom: 10px;
+    }
+    .banner-title { font-size: 28px; font-weight: 700; color: var(--white); line-height: 1.3; margin-bottom: 8px; }
+    .banner-subtitle { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.55; max-width: 480px; }
+    .banner-cta-card {
+      position: absolute; right: 32px; top: 50%; transform: translateY(-50%);
+      background-color: var(--white); border-radius: 3px; padding: 36px 32px; width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.28); text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      text-decoration: none; color: inherit;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .banner-cta-card:hover, .banner-cta-card:focus {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.38);
+      transform: translateY(calc(-50% - 3px)); outline: none;
+    }
+    .banner-cta-card .cta-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(145deg, var(--blue-header), var(--blue-link-dark));
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
+    }
+    .banner-cta-card .cta-icon i { font-size: 24px; color: var(--white); }
+    .banner-cta-card h3 { font-size: 18px; font-weight: 700; color: var(--gray-utility); line-height: 1.3; }
+    .banner-cta-card p  { font-size: 13px; color: var(--gray-meta); line-height: 1.5; }
+    .banner-cta-card .cta-link-text {
+      font-size: 15px; font-weight: 700; color: var(--blue-link);
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 4px; border-bottom: 2px solid transparent; padding-bottom: 2px;
+      transition: border-color 0.18s;
+    }
+    .banner-cta-card:hover .cta-link-text { border-bottom-color: var(--blue-link); }
 
     /* ============================================================
-       PANEL BOTTOM — city seal watermark
-       City_Seal_transparent.png has a black background.
-       invert(1): black bg → white (disappears); gray seal → light
-       gray watermark. Reads cleanly on white at 9% opacity.
+       RESOURCES SECTION
        ============================================================ */
-    .panel-bottom::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 52vh;
-      height: 52vh;
-      max-width: 420px;
-      max-height: 420px;
-      background-image: url('City_Seal_transparent.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      filter: invert(1);
-      opacity: 0.09;
-      pointer-events: none;
+    .resources-section {
+      background-color: var(--gray-section); padding: 36px 0 40px;
+      border-top: 1px solid var(--gray-divider); border-bottom: 1px solid var(--gray-divider);
     }
-
-    /* All content sits above the overlays */
-    .panel-top > *,
-    .panel-bottom > * { position: relative; z-index: 1; }
+    .resources-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .section-heading { font-size: 22px; font-weight: 700; color: var(--gray-utility); margin-bottom: 24px; }
+    .resource-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .resource-card {
+      background-color: var(--white); border: 1px solid var(--gray-divider); border-radius: 4px;
+      padding: 32px 24px 28px; display: flex; flex-direction: column;
+      align-items: center; text-align: center; text-decoration: none; color: var(--gray-body);
+      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s; cursor: pointer;
+    }
+    .resource-card:hover, .resource-card:focus {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12); transform: translateY(-3px);
+      border-color: #b0b8c0; outline: none;
+    }
+    .resource-card:active { transform: translateY(-1px); }
+    .card-icon-tile {
+      width: 72px; height: 72px;
+      background: linear-gradient(145deg, var(--green-icon-lt), var(--green-icon));
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(138,154,30,0.28);
+      transition: box-shadow 0.2s;
+    }
+    .resource-card:hover .card-icon-tile { box-shadow: 0 4px 14px rgba(138,154,30,0.42); }
+    .card-icon-tile i { font-size: 30px; color: var(--white); }
+    .card-title { font-size: 22px; font-weight: 700; color: var(--blue-link-dark); margin-bottom: 8px; line-height: 1.3; }
+    .resource-card:hover .card-title { text-decoration: underline; }
+    .card-desc { font-size: 16px; color: var(--gray-body); line-height: 1.55; }
 
     /* ============================================================
-       DIVIDER — green-to-blue gradient seam between panels.
-       Ties the green of the Minneapolis sailboat logo to the
-       blue header, using both brand color families.
+       LANGUAGE SECTION
        ============================================================ */
-    .panel-divider {
-      height: 4px;
-      flex-shrink: 0;
-      background: linear-gradient(90deg,
-        var(--blue-darker) 0%,
-        var(--blue-header) 20%,
-        var(--green-icon-lt) 60%,
-        var(--green-icon) 100%);
+    .lang-section { background-color: var(--white); padding: 36px 0 40px; }
+    .lang-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .lang-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .lang-section-header h3 { font-size: 22px; font-weight: 700; color: var(--gray-utility); }
+    .lang-section-header i { font-size: 22px; color: var(--blue-link); }
+    .lang-section-sub { font-size: 15px; color: var(--gray-meta); margin-bottom: 22px; }
+    .lang-cards-row {
+      display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
+      scrollbar-width: thin; scrollbar-color: var(--gray-divider) transparent;
+      -webkit-overflow-scrolling: touch;
     }
+    .lang-cards-row::-webkit-scrollbar { height: 5px; }
+    .lang-cards-row::-webkit-scrollbar-track { background: transparent; }
+    .lang-cards-row::-webkit-scrollbar-thumb { background-color: var(--gray-divider); border-radius: 4px; }
+    .lang-card {
+      background-color: var(--white); border: 1px solid var(--gray-divider);
+      border-top: 4px solid var(--blue-header); border-radius: 4px;
+      padding: 16px 18px; min-width: 220px; max-width: 220px; flex-shrink: 0;
+    }
+    .lang-name {
+      font-size: 11px; font-weight: 700; color: var(--blue-header);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+    .lang-card p { font-size: 13px; line-height: 1.5; color: var(--gray-body); }
+    .lang-card p strong { display: block; color: var(--gray-utility); margin-bottom: 3px; font-size: 13px; }
 
     /* ============================================================
-       CITY LOGO / WORDMARK
-       Minneapolis_Logo_White.png: transparent bg, color sailboat.
-       drop-shadow separates it from the blue panel.
+       FOOTER
        ============================================================ */
-    .logo-wrap {
-      margin-bottom: 18px;
-      text-align: center;
+    .site-footer {
+      background-color: var(--gray-utility); color: rgba(255,255,255,0.75);
+      padding: 28px 32px 24px; text-align: center;
     }
-    .logo-wrap img {
-      width: 340px;
-      height: auto;
-      max-width: 90%;
-      object-fit: contain;
-      filter: drop-shadow(0 3px 10px rgba(0,0,0,0.22));
+
+    /* Location block — centered, Lake Street pattern */
+    .footer-location { text-align: center; margin-bottom: 20px; }
+    .footer-logo-wrap { margin-bottom: 16px; }
+    .footer-logo-wrap img { height: 48px; width: auto; object-fit: contain; }
+    .footer-location h3 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 12px; }
+    .footer-location p {
+      font-size: 14px; line-height: 1.9; color: rgba(255,255,255,0.82); margin-bottom: 6px;
     }
+    .footer-location p strong { color: var(--white); }
+    .footer-holiday-link {
+      color: rgba(255,255,255,0.65); font-size: 13px; text-decoration: underline;
+      transition: color 0.18s;
+    }
+    .footer-holiday-link:hover { color: var(--white); }
+    .footer-contact { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.10); }
+    .footer-rule { border: none; border-top: 1px solid rgba(255,255,255,0.12); width: 320px; margin: 14px auto; }
+    .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,0.62); font-size: 13px; text-decoration: none; transition: color 0.18s; }
+    .footer-links a:hover { color: var(--white); text-decoration: underline; }
+    .footer-links .sep { color: rgba(255,255,255,0.22); font-size: 13px; }
+    .footer-copyright { font-size: 12px; color: rgba(255,255,255,0.38); margin-top: 10px; }
 
     /* ============================================================
-       WELCOME TEXT — white on blue
-       ============================================================ */
-    .welcome-text {
-      text-align: center;
-      margin-bottom: 26px;
-    }
-    .welcome-text h1 {
-      font-size: 40px;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 10px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    }
-    .welcome-text p {
-      font-size: 19px;
-      color: rgba(255,255,255,0.88);
-      line-height: 1.55;
-      max-width: 580px;
-    }
-
-    /* ============================================================
-       START HERE BUTTON
-       Minneapolis green on blue panel — visually pops, on-brand.
-       White text on #a2b427: contrast ratio ~4.6:1 passes WCAG AA
-       for large/bold text (this is 30px bold — qualifies as large).
-       ============================================================ */
-    .start-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      background-color: var(--green-icon-lt);
-      color: var(--white);
-      font-family: var(--font-ui);
-      font-size: 30px;
-      font-weight: 700;
-      padding: 22px 80px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-      transition: background-color 0.18s, transform 0.18s, box-shadow 0.18s;
-      letter-spacing: 0.01em;
-    }
-    .start-btn:hover,
-    .start-btn:focus {
-      background-color: var(--green-btn-dark);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.30);
-      outline: none;
-    }
-    .start-btn:active { transform: translateY(-1px); }
-    .start-btn .btn-icon-left  { font-size: 24px; }
-    .start-btn .btn-icon-right {
-      font-size: 24px;
-      transition: transform 0.18s;
-    }
-    .start-btn:hover .btn-icon-right { transform: translateX(5px); }
-
-    /* ============================================================
-       MULTILINGUAL HELP — bottom white panel
-       ============================================================ */
-    .lang-notice {
-      width: 100%;
-      max-width: 1200px;
-    }
-
-    .lang-notice-heading {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-meta);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .lang-notice-heading i { color: var(--blue-header); font-size: 15px; }
-    .lang-notice-heading::before,
-    .lang-notice-heading::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background-color: var(--gray-divider);
-      max-width: 220px;
-    }
-
-    /* 4-column × 2-row grid for 8 languages */
-    .lang-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .lang-tile {
-      background-color: var(--white);
-      border: 1px solid var(--gray-divider);
-      border-top: 3px solid var(--blue-header);
-      border-radius: 4px;
-      padding: 11px 13px;
-    }
-    .lang-tile-name {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--blue-header);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 3px;
-    }
-    .lang-tile p {
-      font-size: 13px;
-      line-height: 1.4;
-      color: var(--gray-body);
-    }
-
-    /* ============================================================
-       BOTTOM BAR — legal links
-       ============================================================ */
-    .bottom-bar {
-      background-color: var(--gray-utility);
-      padding: 11px 32px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .bottom-bar a {
-      color: rgba(255,255,255,0.52);
-      font-size: 12px;
-      transition: color 0.15s;
-    }
-    .bottom-bar a:hover { color: var(--white); }
-    .bottom-bar .sep { color: rgba(255,255,255,0.20); font-size: 12px; }
-
-    /* ============================================================
-       ENTRANCE ANIMATIONS — staggered fade-up on load
+       ANIMATIONS
        ============================================================ */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .logo-wrap    { animation: fadeUp 0.50s ease-out both; }
-    .welcome-text { animation: fadeUp 0.50s 0.10s ease-out both; }
-    .start-btn    { animation: fadeUp 0.50s 0.20s ease-out both; }
-    .lang-notice  { animation: fadeUp 0.45s 0.30s ease-out both; }
+    .page-hero        { animation: fadeUp 0.4s ease-out both; }
+    .city-hero-banner { animation: fadeUp 0.4s 0.08s ease-out both; }
+    .resource-card:nth-child(1) { animation: fadeUp 0.35s 0.10s ease-out both; }
+    .resource-card:nth-child(2) { animation: fadeUp 0.35s 0.15s ease-out both; }
+    .resource-card:nth-child(3) { animation: fadeUp 0.35s 0.20s ease-out both; }
+    .resource-card:nth-child(4) { animation: fadeUp 0.35s 0.25s ease-out both; }
+    .resource-card:nth-child(5) { animation: fadeUp 0.35s 0.30s ease-out both; }
+    .resource-card:nth-child(6) { animation: fadeUp 0.35s 0.35s ease-out both; }
+    .lang-section     { animation: fadeUp 0.35s 0.40s ease-out both; }
 
     /* ============================================================
-       RESPONSIVE — 1080p, 1366px, 1600px monitors
+       RESPONSIVE
        ============================================================ */
     @media (max-width: 1366px) {
-      .panel-top    { padding: 28px 48px 22px; }
-      .panel-bottom { padding: 18px 48px 0; }
-      .logo-wrap img        { width: 280px; }
-      .welcome-text h1      { font-size: 34px; }
-      .welcome-text p       { font-size: 17px; }
-      .start-btn            { font-size: 26px; padding: 20px 68px; }
-      .lang-tile p          { font-size: 12px; }
-      .panel-bottom::before { width: 44vh; height: 44vh; }
+      .site-header { min-height: 78px; }
+      .header-logo-wrap img { height: 48px; }
+      .header-title-wrap h1 { font-size: 22px; }
+      .page-hero-inner h2 { font-size: 30px; }
+      .banner-title { font-size: 23px; }
+      .banner-text-col { padding-right: 300px; }
+      .banner-cta-card { width: 275px; padding: 28px 24px; right: 32px; }
+      .card-icon-tile { width: 64px; height: 64px; }
+      .card-icon-tile i { font-size: 26px; }
+      .card-title { font-size: 19px; }
     }
-
     @media (max-width: 1024px) {
-      .lang-grid         { grid-template-columns: repeat(2, 1fr); }
-      .logo-wrap img     { width: 240px; }
-      .welcome-text h1   { font-size: 28px; }
-      .start-btn         { font-size: 22px; padding: 18px 56px; }
+      .resource-grid { grid-template-columns: repeat(2, 1fr); }
+      .banner-text-col { padding-right: 0; padding-bottom: 180px; }
+      .banner-cta-card { width: calc(100% - 64px); position: static; transform: none; margin-top: 20px; }
+      .banner-inner { flex-direction: column; }
     }
-
     @media print {
-      .panel-bottom::before { display: none; }
-      .panel-top {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
+      .site-header, .site-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
 
-  <!-- START: Top Panel — blue background, logo, text, button -->
-  <section class="panel-top" role="banner">
-
-    <!-- START: Color logo / wordmark -->
-    <div class="logo-wrap">
-      <img src="Minneapolis_Logo_White.png"
-           alt="City of Minneapolis — City of Lakes"
-           onerror="this.src='whitelogo.png';">
+  <!-- START: Idle Overlay -->
+  <div id="idle-overlay" role="alertdialog" aria-modal="true" aria-labelledby="idle-heading">
+    <div id="idle-box">
+      <i class="fa-solid fa-clock" aria-hidden="true"></i>
+      <h2 id="idle-heading">Still there?</h2>
+      <p>This kiosk will return to the home screen in</p>
+      <div id="idle-countdown" aria-live="polite">30</div>
+      <button id="idle-stay" onclick="cancelIdle()">I'm Still Here</button>
     </div>
-    <!-- STOP: Color logo / wordmark -->
-
-    <!-- START: Welcome text -->
-    <div class="welcome-text">
-      <h1>Welcome to the Public Service Center</h1>
-      <p>Access City of Minneapolis services and resources. Tap the button below to get started.</p>
-    </div>
-    <!-- STOP: Welcome text -->
-
-    <!-- START: Start Here button -->
-    <a href="kiosk.html" class="start-btn" role="button">
-      <i class="fa-solid fa-hand-pointer btn-icon-left" aria-hidden="true"></i>
-      Start Here
-      <i class="fa-solid fa-arrow-right btn-icon-right" aria-hidden="true"></i>
-    </a>
-    <!-- STOP: Start Here button -->
-
-  </section>
-  <!-- STOP: Top Panel -->
-
-  <!-- Gradient divider seam -->
-  <div class="panel-divider" aria-hidden="true"></div>
-
-  <!-- START: Bottom Panel — white, seal watermark, languages -->
-  <section class="panel-bottom" role="complementary" aria-label="Multilingual assistance">
-
-    <div class="lang-notice">
-
-      <div class="lang-notice-heading">
-        <i class="fa-solid fa-language" aria-hidden="true"></i>
-        Need help or an interpreter? Ask a staff member at the counter.
-        <i class="fa-solid fa-language" aria-hidden="true"></i>
-      </div>
-
-      <div class="lang-grid">
-
-        <!-- START: Spanish -->
-        <div class="lang-tile" lang="es">
-          <div class="lang-tile-name">Spanish / Español</div>
-          <p>¿Necesita ayuda o un intérprete? Hable con el personal en el mostrador.</p>
-        </div>
-        <!-- STOP: Spanish -->
-
-        <!-- START: Somali -->
-        <div class="lang-tile" lang="so">
-          <div class="lang-tile-name">Somali / Soomaali</div>
-          <p>Ma u baahan tahay caawimaad ama turjubaan? La hadal shaqaalaha miiska.</p>
-        </div>
-        <!-- STOP: Somali -->
-
-        <!-- START: Hmong -->
-        <div class="lang-tile" lang="hmn">
-          <div class="lang-tile-name">Hmong / Hmoob</div>
-          <p>Xav tau kev pab los yog neeg txhais lus? Hais rau neeg ua haujlwm ntawm lub txee.</p>
-        </div>
-        <!-- STOP: Hmong -->
-
-        <!-- START: Vietnamese -->
-        <div class="lang-tile" lang="vi">
-          <div class="lang-tile-name">Vietnamese / Tiếng Việt</div>
-          <p>Cần hỗ trợ hoặc phiên dịch? Hãy nói với nhân viên tại quầy.</p>
-        </div>
-        <!-- STOP: Vietnamese -->
-
-        <!-- START: Lao -->
-        <div class="lang-tile" lang="lo">
-          <div class="lang-tile-name">Lao / ລາວ</div>
-          <p>ຕ້ອງການການຊ່ວຍເຫຼືອຫຼືນາຍພາສາ? ກະລຸນາເວົ້າກັບພະນັກງານທີ່ເຄົາເຕີ.</p>
-        </div>
-        <!-- STOP: Lao -->
-
-        <!-- START: Korean -->
-        <div class="lang-tile" lang="ko">
-          <div class="lang-tile-name">Korean / 한국어</div>
-          <p>도움이나 통역이 필요하신가요? 카운터 직원에게 말씀해 주세요.</p>
-        </div>
-        <!-- STOP: Korean -->
-
-        <!-- START: Chinese -->
-        <div class="lang-tile" lang="zh-Hant">
-          <div class="lang-tile-name">Chinese / 中文</div>
-          <p>需要幫助或翻譯服務？請向櫃檯人員詢問。</p>
-        </div>
-        <!-- STOP: Chinese -->
-
-        <!-- START: Amharic -->
-        <div class="lang-tile" lang="am">
-          <div class="lang-tile-name">Amharic / አማርኛ</div>
-          <p>እርዳታ ወይም ተርጓሚ ያስፈልግዎታል? እባክዎ በቆጠቢ ጠረጴዛ ሰራተኞቹን ይጠይቁ።</p>
-        </div>
-        <!-- STOP: Amharic -->
-
-      </div>
-    </div>
-
-  </section>
-  <!-- STOP: Bottom Panel -->
-
-  <!-- START: Bottom bar -->
-  <div class="bottom-bar" role="contentinfo">
-    <a href="https://www.minneapolismn.gov/footer-content/privacy-policy/"
-       target="_blank" rel="noopener">Privacy Policy</a>
-    <span class="sep" aria-hidden="true">|</span>
-    <a href="https://www.minneapolismn.gov/footer-content/terms-of-use/"
-       target="_blank" rel="noopener">Terms of Use</a>
-    <span class="sep" aria-hidden="true">|</span>
-    <a href="https://www.minneapolismn.gov/footer-content/website-accessibility/"
-       target="_blank" rel="noopener">Accessibility</a>
-    <span class="sep" aria-hidden="true">|</span>
-    <span style="color:rgba(255,255,255,0.35); font-size:12px;">© 2026 City of Minneapolis</span>
   </div>
-  <!-- STOP: Bottom bar -->
+  <!-- STOP: Idle Overlay -->
 
+  <!-- START: Offline Banner -->
+  <div id="offline-banner" role="alert" aria-live="assertive">
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>&nbsp;
+    Network connection lost — please see staff for assistance
+  </div>
+  <!-- STOP: Offline Banner -->
+
+
+  <!-- START: Site Header -->
+  <header class="site-header" role="banner">
+    <div class="header-logo-wrap">
+      <img src="whitelogo.png" alt="City of Minneapolis — City of Lakes">
+    </div>
+    <div class="header-title-wrap">
+      <h1>Public Service Center</h1>
+      <p>City of Minneapolis — Resident Resource Kiosk</p>
+    </div>
+  </header>
+  <!-- STOP: Site Header -->
+
+  <!-- START: Page Hero -->
+  <section class="page-hero" aria-label="Page introduction">
+    <div class="page-hero-inner">
+      <h2>Welcome to the Public Service Center</h2>
+      <p>
+        Our goal is to provide straightforward information and accessible services to everyone.
+      </p>
+      <ul class="hero-list" aria-label="Our commitments">
+        <li>Remove language barriers</li>
+        <li>Accommodate disabilities</li>
+        <li>Fulfill service and information needs of our diverse community</li>
+        <li>Make it easy for you to receive our services</li>
+      </ul>
+    </div>
+  </section>
+  <!-- STOP: Page Hero -->
+
+  <!-- START: City Website Hero Banner -->
+  <div class="city-hero-banner" aria-label="City of Minneapolis website">
+    <div class="banner-inner">
+      <div class="banner-text-col">
+        <p class="banner-eyebrow">Official City Website</p>
+        <h2 class="banner-title">Looking for something<br>not listed here?</h2>
+        <p class="banner-subtitle">The full City of Minneapolis website has everything — permits, payments, programs, and services for every resident.</p>
+      </div>
+      <a href="https://www.minneapolismn.gov/" class="banner-cta-card" target="_blank" rel="noopener" aria-label="Visit the City of Minneapolis website">
+        <div class="cta-icon" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></div>
+        <h3>Explore the full City of Minneapolis website</h3>
+        <p>Access all city services, departments, payments, and programs in one place.</p>
+        <span class="cta-link-text">Visit minneapolismn.gov <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </div>
+  <!-- STOP: City Website Hero Banner -->
+
+  <!-- START: Resources Section -->
+  <section class="resources-section" aria-label="Available services">
+    <div class="resources-inner">
+      <h2 class="section-heading">I want to&hellip;</h2>
+      <div class="resource-grid">
+
+        <!-- START: Card 1 -->
+        <a href="https://www.minneapolismn.gov/government/government-data/request-public-data/" class="resource-card" target="_blank" rel="noopener" aria-label="Request public data">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div>
+          <span class="card-title">Request public data</span>
+          <p class="card-desc">Submit a request to access public government data and records.</p>
+        </a>
+        <!-- STOP: Card 1 -->
+
+        <!-- START: Card 2 -->
+        <a href="https://www2.minneapolismn.gov/government/departments/civil-rights/" class="resource-card" target="_blank" rel="noopener" aria-label="File a civil rights complaint">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div>
+          <span class="card-title">File a civil rights complaint</span>
+          <p class="card-desc">Report a civil rights violation or file a discrimination complaint.</p>
+        </a>
+        <!-- STOP: Card 2 -->
+
+        <!-- START: Card 3 -->
+        <a href="https://www.minneapolismn.gov/government/departments/finance/what-we-do/procurement/" class="resource-card" target="_blank" rel="noopener" aria-label="View city procurement">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-briefcase"></i></div>
+          <span class="card-title">View City procurement</span>
+          <p class="card-desc">Find bids, contracts, and vendor opportunities with the City of Minneapolis.</p>
+        </a>
+        <!-- STOP: Card 3 -->
+
+        <!-- START: Card 4 -->
+        <a href="https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/" class="resource-card" target="_blank" rel="noopener" aria-label="Submit an online appeal">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-file-pen"></i></div>
+          <span class="card-title">Submit an online appeal</span>
+          <p class="card-desc">File an administrative appeal for a City decision or citation online.</p>
+        </a>
+        <!-- STOP: Card 4 -->
+
+        <!-- START: Card 5 -->
+        <a href="https://pdx.minneapolismn.gov/ProjectDox/index.aspx" class="resource-card" target="_blank" rel="noopener" aria-label="Access ProjectDox ePlan Review">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-drafting-compass"></i></div>
+          <span class="card-title">ePlan review — ProjectDox</span>
+          <p class="card-desc">Submit and track electronic plan reviews for permits and inspections.</p>
+        </a>
+        <!-- STOP: Card 5 -->
+
+        <!-- START: Card 6 -->
+        <a href="https://store.metrotransit.org/" class="resource-card" target="_blank" rel="noopener" aria-label="Get a Metro Transit Go-To Card">
+          <div class="card-icon-tile" aria-hidden="true"><i class="fa-solid fa-bus"></i></div>
+          <span class="card-title">Get a Metro Transit Go-To Card</span>
+          <p class="card-desc">Order or reload your Go-To Card for bus and rail travel.</p>
+        </a>
+        <!-- STOP: Card 6 -->
+
+      </div>
+    </div>
+  </section>
+  <!-- STOP: Resources Section -->
+
+  <!-- START: Language Assistance Section -->
+  <section class="lang-section" aria-label="Multilingual assistance">
+    <div class="lang-inner">
+      <div class="lang-section-header">
+        <i class="fa-solid fa-language" aria-hidden="true"></i>
+        <h3>Need help?</h3>
+      </div>
+      <p class="lang-section-sub">Please speak with staff at the service counter. Assistance is available in multiple languages.</p>
+      <div class="lang-cards-row" role="list">
+        <div class="lang-card" role="listitem" lang="es">
+          <div class="lang-name">Spanish / Español</div>
+          <p><strong>¿Necesita ayuda en persona?</strong> Por favor hable con el personal en el mostrador de servicio.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="so">
+          <div class="lang-name">Somali / Soomaali</div>
+          <p><strong>Ma u baahan tahay caawimaad shaqsiyeed?</strong> Fadlan la hadal wakiilka adeegga ee jooga miiska.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="hmn">
+          <div class="lang-name">Hmong / Hmoob</div>
+          <p><strong>Xav tau kev pab tus kheej?</strong> Thov nrog ib tus neeg pabcuam tham ntawm lub txee.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="vi">
+          <div class="lang-name">Vietnamese / Tiếng Việt</div>
+          <p><strong>Bạn cần hỗ trợ trực tiếp?</strong> Vui lòng nói chuyện với nhân viên phục vụ tại quầy.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="lo">
+          <div class="lang-name">Lao / ລາວ</div>
+          <p><strong>ຕ້ອງການການຊ່ວຍເຫຼືອສ່ວນຕົວບໍ?</strong> ກະລຸນາເວົ້າກັບພະນັກງານບໍລິການທີ່ເຄົາເຕີ.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="ko">
+          <div class="lang-name">Korean / 한국어</div>
+          <p><strong>개인 도움이 필요하신가요?</strong> 카운터에 있는 서비스 담당자에게 말씀해 주세요.</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="zh-Hant">
+          <div class="lang-name">Chinese / 中文</div>
+          <p><strong>需要個人協助嗎？</strong> 請在櫃檯與服務人員交談。</p>
+        </div>
+        <div class="lang-card" role="listitem" lang="am">
+          <div class="lang-name">Amharic / አማርኛ</div>
+          <p><strong>የግል ድጋፍ ያስፈልግዎታል?</strong> እባክዎን በአገልግሎት ቆጠቢ ውስጥ ካሉ ሠራተኞች ጋር ይነጋገሩ።</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- STOP: Language Assistance Section -->
+
+  <!-- START: Footer -->
   <!--
-    NO SCRIPTS — intentional.
-    Attract screen displays indefinitely with no timers or reloads.
-    All idle/self-healing logic lives in kiosk.html only.
+    Matches minneapolismn.gov footer — Lake Street format applied to PSC.
+    Logo, location name, address/hours/phone centered, rule, legal links.
   -->
+  <footer class="site-footer" role="contentinfo">
+
+    <div class="footer-location">
+      <div class="footer-logo-wrap">
+        <img src="whitelogo.png" alt="City of Minneapolis">
+      </div>
+
+      <h3>City of Minneapolis Public Service Center</h3>
+
+      <p>
+        <strong>Address:</strong> 505 Fourth Avenue South, Skyway Level, Minneapolis, MN 55415
+      </p>
+
+      <p>
+        <strong>Hours:</strong><br>
+        Monday – Thursday: 8:00 a.m. – 4:00 p.m.<br>
+        Friday: 9:00 a.m. – 4:00 p.m.<br>
+        <a href="https://www.minneapolismn.gov/contact-us/building-locations/city-holidays/"
+           target="_blank" rel="noopener" class="footer-holiday-link">
+          View city holidays
+        </a>
+      </p>
+
+      <p class="footer-contact">
+        <strong>Phone:</strong> 311 or 612-673-3000<br>
+        <strong>Relay Service:</strong> 612-673-3000
+      </p>
+    </div>
+
+    <hr class="footer-rule" aria-hidden="true">
+
+    <nav class="footer-links" aria-label="Footer links">
+      <a href="https://www.minneapolismn.gov/footer-content/privacy-policy/"
+         target="_blank" rel="noopener">Privacy Policy</a>
+      <span class="sep" aria-hidden="true">|</span>
+      <a href="https://www.minneapolismn.gov/footer-content/terms-of-use/"
+         target="_blank" rel="noopener">Terms of Use</a>
+      <span class="sep" aria-hidden="true">|</span>
+      <a href="https://www.minneapolismn.gov/footer-content/website-accessibility/"
+         target="_blank" rel="noopener">Accessibility</a>
+    </nav>
+
+    <p class="footer-copyright">© 2026 City of Minneapolis</p>
+
+  </footer>
+  <!-- STOP: Footer -->
+
+  <!-- ============================================================
+       SELF-HEALING SCRIPTS
+       ============================================================ -->
+  <script>
+    let idleWarnTimer, idleReloadTimer, countdownInterval, countdownVal = 30;
+    function startIdleTimers() { idleWarnTimer = setTimeout(showIdleWarning, IDLE_WARN_MS); }
+    function resetIdleTimers() {
+      clearTimeout(idleWarnTimer); clearTimeout(idleReloadTimer); clearInterval(countdownInterval);
+      hideIdleWarning(); startIdleTimers();
+    }
+    function showIdleWarning() {
+      countdownVal = Math.round((IDLE_RELOAD_MS - IDLE_WARN_MS) / 1000);
+      document.getElementById('idle-countdown').textContent = countdownVal;
+      document.getElementById('idle-overlay').classList.add('visible');
+      countdownInterval = setInterval(function() {
+        countdownVal--;
+        document.getElementById('idle-countdown').textContent = countdownVal;
+        if (countdownVal <= 0) { clearInterval(countdownInterval); window.location.href = KIOSK_HOME_URL; }
+      }, 1000);
+      idleReloadTimer = setTimeout(function() { window.location.href = KIOSK_HOME_URL; }, IDLE_RELOAD_MS - IDLE_WARN_MS + 1000);
+    }
+    function hideIdleWarning() { document.getElementById('idle-overlay').classList.remove('visible'); clearInterval(countdownInterval); }
+    function cancelIdle() { resetIdleTimers(); }
+    ['click','touchstart','touchend','keydown','mousemove','scroll'].forEach(function(e) { document.addEventListener(e, resetIdleTimers, {passive:true}); });
+    startIdleTimers();
+    document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') resetIdleTimers(); });
+    var offlineBanner = document.getElementById('offline-banner');
+    window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });
+    window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); setTimeout(function() { window.location.href = KIOSK_HOME_URL; }, 2000); });
+    if (!navigator.onLine) { offlineBanner.classList.add('visible'); }
+    setInterval(function() {
+      fetch(HEALTH_CHECK_URL, {method:'HEAD',cache:'no-store'})
+        .then(function(r) { if (!r.ok) throw new Error(); offlineBanner.classList.remove('visible'); })
+        .catch(function() { offlineBanner.classList.add('visible'); });
+    }, HEALTH_CHECK_MS);
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+  </script>
 
 </body>
 </html>
